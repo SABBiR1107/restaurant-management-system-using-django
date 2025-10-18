@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome - Velvet Spoon{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 mb-4">Welcome to Velvet Spoon</h1>
+        <p class="lead mb-4">Experience culinary excellence with our carefully crafted dishes</p>
+        <div class="row g-3 justify-content-center">
+            <div class="col-auto">
+                <a href="{% url 'menu_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-utensils"></i> View Menu
+                </a>
+            </div>
+            <div class="col-auto">
+                <a href="{% url 'make_reservation' %}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-calendar-alt"></i> Make Reservation
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2>Why Choose Us</h2>
+                <p class="lead">Discover what makes our restaurant special</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-utensils fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Fresh Ingredients</h5>
+                        <p class="card-text">We use only the freshest, locally-sourced ingredients in all our dishes.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-star fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Expert Chefs</h5>
+                        <p class="card-text">Our talented chefs create culinary masterpieces that delight the senses.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-concierge-bell fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Excellent Service</h5>
+                        <p class="card-text">Experience exceptional service in a warm and welcoming atmosphere.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Menu Preview -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2>Featured Dishes</h2>
+                <p class="lead">A taste of what we offer</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for item in featured_items %}
+            <div class="col-md-3">
+                <div class="card">
+                    {% if item.image %}
+                    <img src="{{ item.image.url }}" class="card-img-top menu-item-image" alt="{{ item.name }}">
+                    {% else %}
+                    <img src="/static/images/default-food.png" class="card-img-top menu-item-image" alt="{{ item.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.name }}</h5>
+                        <p class="card-text text-muted">{{ item.description|truncatewords:10 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 text-primary">BDT {{ item.price }}</span>
+                            {% if user.is_authenticated %}
+                            <form action="{% url 'add_to_cart' item.id %}" method="post" class="d-inline add-to-cart-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-cart-plus"></i> Add
+                                </button>
+                            </form>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'menu_list' %}" class="btn btn-outline-primary">View Full Menu</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

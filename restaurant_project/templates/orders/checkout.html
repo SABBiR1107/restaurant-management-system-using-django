@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Checkout - Velvet Spoon{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 mb-4">Checkout</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Order Details</h5>
+                    {% for item in cart.items.all %}
+                    <div class="row align-items-center mb-3">
+                        <div class="col-2">
+                            {% if item.menu_item.image %}
+                            <img src="{{ item.menu_item.image.url }}" class="img-fluid rounded" alt="{{ item.menu_item.name }}">
+                            {% else %}
+                            <img src="/static/images/default-food.jpg" class="img-fluid rounded" alt="{{ item.menu_item.name }}">
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            <h6>{{ item.menu_item.name }}</h6>
+                            <small class="text-muted">Qty: {{ item.quantity }}</small>
+                        </div>
+                        <div class="col-4 text-end">
+                            <span>BDT {{ item.total_price }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Delivery Type Selection -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Delivery Type</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="delivery_type" id="dine_in" value="dine_in" checked>
+                                        <label class="form-check-label" for="dine_in">
+                                            <i class="fas fa-utensils"></i> Dine In
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="delivery_type" id="takeaway" value="takeaway">
+                                        <label class="form-check-label" for="takeaway">
+                                            <i class="fas fa-shopping-bag"></i> Takeaway
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table Number (for Dine In) -->
+                        <div class="mb-3" id="table_number_field">
+                            <label for="table_number" class="form-label">Table Number</label>
+                            <input type="text" name="table_number" id="table_number" class="form-control" placeholder="Enter your table number">
+                            <div class="form-text">Please enter the table number where you are seated.</div>
+                        </div>
+
+                        <!-- Delivery Address (for Takeaway) -->
+                        <div class="mb-3" id="delivery_address_field" style="display: none;">
+                            <label for="delivery_address" class="form-label">Delivery Address</label>
+                            <textarea name="delivery_address" id="delivery_address" class="form-control" rows="3" placeholder="Enter your complete delivery address..."></textarea>
+                            <div class="form-text">Please provide your complete address for takeaway delivery.</div>
+                        </div>
+
+                        <!-- Special Instructions -->
+                        <div class="mb-3">
+                            <label for="special_instructions" class="form-label">Special Instructions</label>
+                            <textarea name="special_instructions" id="special_instructions" class="form-control" rows="3" placeholder="Any special requests or dietary restrictions..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>BDT {{ cart.total_price }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax:</span>
+                        <span>BDT {{ cart.total_price|floatformat:2 }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong>BDT {{ cart.total_price }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dineInRadio = document.getElementById('dine_in');
+    const takeawayRadio = document.getElementById('takeaway');
+    const tableNumberField = document.getElementById('table_number_field');
+    const deliveryAddressField = document.getElementById('delivery_address_field');
+    const tableNumberInput = document.getElementById('table_number');
+    const deliveryAddressInput = document.getElementById('delivery_address');
+
+    function toggleFields() {
+        if (dineInRadio.checked) {
+            tableNumberField.style.display = 'block';
+            deliveryAddressField.style.display = 'none';
+            tableNumberInput.required = true;
+            deliveryAddressInput.required = false;
+        } else if (takeawayRadio.checked) {
+            tableNumberField.style.display = 'none';
+            deliveryAddressField.style.display = 'block';
+            tableNumberInput.required = false;
+            deliveryAddressInput.required = true;
+        }
+    }
+
+    // Add event listeners
+    dineInRadio.addEventListener('change', toggleFields);
+    takeawayRadio.addEventListener('change', toggleFields);
+
+    // Initialize on page load
+    toggleFields();
+});
+</script>
+{% endblock %}

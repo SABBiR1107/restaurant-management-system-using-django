@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ menu_item.name }} - Velvet Spoon{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'menu_list' %}">Menu</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ menu_item.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Menu Item Image -->
+        <div class="col-lg-6 mb-4">
+            {% if menu_item.image %}
+            <img src="{{ menu_item.image.url }}" class="img-fluid rounded shadow" alt="{{ menu_item.name }}">
+            {% else %}
+            <img src="/static/images/default-food.jpg" class="img-fluid rounded shadow" alt="{{ menu_item.name }}">
+            {% endif %}
+        </div>
+
+        <!-- Menu Item Details -->
+        <div class="col-lg-6">
+            <h1 class="display-5 mb-3">{{ menu_item.name }}</h1>
+            
+            <!-- Category -->
+            <p class="text-muted mb-3">
+                <i class="fas fa-tag"></i> {{ menu_item.category.name }}
+            </p>
+
+            <!-- Price -->
+            <div class="mb-4">
+                <span class="display-6 text-primary">BDT {{ menu_item.price }}</span>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <h5>Description</h5>
+                <p class="lead">{{ menu_item.description }}</p>
+            </div>
+
+            <!-- Dietary Information -->
+            <div class="mb-4">
+                <h5>Dietary Information</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    {% if menu_item.is_vegetarian %}
+                    <span class="badge bg-success fs-6">
+                        <i class="fas fa-leaf"></i> Vegetarian
+                    </span>
+                    {% endif %}
+                    {% if menu_item.is_spicy %}
+                    <span class="badge bg-danger fs-6">
+                        <i class="fas fa-pepper-hot"></i> Spicy
+                    </span>
+                    {% endif %}
+                    {% if menu_item.calories %}
+                    <span class="badge bg-info fs-6">
+                        <i class="fas fa-fire"></i> {{ menu_item.calories }} calories
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Preparation Time -->
+            {% if menu_item.preparation_time %}
+            <div class="mb-4">
+                <p class="text-muted">
+                    <i class="fas fa-clock"></i> 
+                    Preparation time: {{ menu_item.preparation_time }} minutes
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- Add to Cart Form -->
+            <div class="mb-4">
+                {% if user.is_authenticated %}
+                <form action="{% url 'add_to_cart' menu_item.id %}" method="post" class="d-inline add-to-cart-form">
+                    {% csrf_token %}
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="quantity" class="col-form-label">Quantity:</label>
+                        </div>
+                        <div class="col-auto">
+                            <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="10" style="width: 80px;">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    Please <a href="{% url 'login' %}">login</a> to add items to your cart.
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Back to Menu -->
+            <div>
+                <a href="{% url 'menu_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Menu
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Items -->
+    {% if related_items %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-4">You might also like</h3>
+            <div class="row">
+                {% for item in related_items %}
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card h-100">
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" class="card-img-top menu-item-image" alt="{{ item.name }}">
+                        {% else %}
+                        <img src="/static/images/default-food.jpg" class="card-img-top menu-item-image" alt="{{ item.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title">{{ item.name }}</h6>
+                            <p class="card-text text-muted small">{{ item.description|truncatewords:8 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h6 text-primary mb-0">BDT {{ item.price }}</span>
+                                <a href="{% url 'menu_item_detail' item.pk %}" class="btn btn-outline-primary btn-sm">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Reservation Details - Velvet Spoon{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 mb-4">Reservation Details</h1>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Reservation Date:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            {{ reservation.reservation_date|date:"F d, Y" }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Reservation Time:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            {{ reservation.reservation_time|time:"g:i A" }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Party Size:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            {{ reservation.party_size }} people
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Table:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            Table {{ reservation.table.number }} ({{ reservation.table.get_table_type_display }})
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Status:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="badge 
+                                {% if reservation.status == 'confirmed' %}bg-success
+                                {% elif reservation.status == 'cancelled' %}bg-danger
+                                {% elif reservation.status == 'completed' %}bg-secondary
+                                {% else %}bg-warning{% endif %}">
+                                {{ reservation.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% if reservation.special_requests %}
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Special Requests:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            {{ reservation.special_requests }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Created:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            {{ reservation.created_at|date:"M d, Y g:i A" }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        {% if reservation.status in 'pending,confirmed' and reservation.is_upcoming %}
+                        <a href="{% url 'cancel_reservation' reservation.id %}" class="btn btn-danger">
+                            Cancel Reservation
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'reservation_history' %}" class="btn btn-outline-secondary">
+                            Back to History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

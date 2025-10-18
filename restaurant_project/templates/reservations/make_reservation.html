@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Make Reservation - Velvet Spoon{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Make a Reservation</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.reservation_date|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.reservation_time|as_crispy_field }}
+                            </div>
+                        </div>
+                        {{ form.party_size|as_crispy_field }}
+                        {{ form.special_requests|as_crispy_field }}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Book Table</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

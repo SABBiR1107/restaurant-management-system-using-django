@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Reservation History - Velvet Spoon{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 mb-4">Reservation History</h1>
+        </div>
+    </div>
+
+    {% if reservations %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Party Size</th>
+                                    <th>Table</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reservation in reservations %}
+                                <tr>
+                                    <td>{{ reservation.reservation_date|date:"M d, Y" }}</td>
+                                    <td>{{ reservation.reservation_time|time:"g:i A" }}</td>
+                                    <td>{{ reservation.party_size }} people</td>
+                                    <td>Table {{ reservation.table.number }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if reservation.status == 'confirmed' %}bg-success
+                                            {% elif reservation.status == 'cancelled' %}bg-danger
+                                            {% elif reservation.status == 'completed' %}bg-secondary
+                                            {% else %}bg-warning{% endif %}">
+                                            {{ reservation.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'reservation_detail' reservation.id %}" class="btn btn-sm btn-outline-primary">
+                                            Details
+                                        </a>
+                                        {% if reservation.status in 'pending,confirmed' and reservation.is_upcoming %}
+                                        <a href="{% url 'cancel_reservation' reservation.id %}" class="btn btn-sm btn-outline-danger">
+                                            Cancel
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="card">
+                <div class="card-body py-5">
+                    <i class="fas fa-calendar fa-4x text-muted mb-4"></i>
+                    <h3>No reservations yet</h3>
+                    <p class="text-muted">Your reservation history will appear here.</p>
+                    <a href="{% url 'make_reservation' %}" class="btn btn-primary">Make Reservation</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
